@@ -6,8 +6,8 @@
 
 #include "config.h"
 
-//TODO: consolidate into just one print call?
-//TODO: hop on godbolt and check if using fputs is worthwhile
+// TODO: consolidate into just one print call?
+// TODO: hop on godbolt and check if using fputs is worthwhile
 #define ERROR_USAGE(...) \
                     fputs("\x1b[1;91merror\x1b[0m: ", stdout); \
                     printf(__VA_ARGS__); \
