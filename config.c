@@ -14,7 +14,8 @@ config_parse(const char *path)
         PANIC("file at path `%s` doesn't exist.\n", path);
     }
 
-    /* TODO: read into a buffer and process i.e. fseek, etc. */
+    /* TODO: read into a buffer and process i.e. fseek, etc.
+       TODO: toml? ron? kdl? json? yaml? ini? idk */
 
     if (fclose(fd) != 0) {
         PANIC("failed to close file at path `%s`\n", path);
