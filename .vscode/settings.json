@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        ".als.json": "jsonc",
-        "config.h": "c",
-        "stdio.h": "c",
-        "xlib.h": "c"
-    }
-}
