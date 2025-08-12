@@ -1,7 +1,12 @@
+VERSION = 0.1.0
+
 CC = gcc
 SRC = par.c config.c
 
+CPPFLAGS = -DVERSION=\"$(VERSION)\" # WTF?
+CFLAGS = -std=c99 -pedantic -Wall -O3 $(CPPFLAGS)
+
 build:
-	$(CC) -std=c99 $(SRC) -o par
+	$(CC) $(CFLAGS) $(SRC) -o par
 
 .PHONY: build
