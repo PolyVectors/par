@@ -20,12 +20,11 @@ static unsigned char
 indents(const char *str)
 {
     unsigned char indentation = 0;
-    for (size_t i = 0; i < strlen(str); i++) {
+    for (size_t i = 0; i < strlen(str); i++)
         if (str[i] == '\t' || str[i] == '\n' || str[i] == ' ')
             indentation++;
         else
             return indentation;
-    }
     return indentation;
 }
 

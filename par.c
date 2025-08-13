@@ -1,8 +1,9 @@
-#include <X11/Xlib.h>
-
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 
 #include "config.h"
 #include "util.h"
@@ -18,23 +19,63 @@
                          usage(1);
 
 static void
-run(Config *config)
-{
-    /* TODO: spawn X11 window, no decorations, fixed size */
-    (void)(config);
-}
-
-static void
 usage(int code)
 {
     puts(
-        "par, a minimalist X11 status bar.\n"
+        "par, an elementary X11 status bar.\n"
         "\n"
         "Usage: par <option(s)>\n"
         "\t-h (--help)                Show this text\n"
         "\t-v (--version)             Display the version\n"
         "\t-c (--config) <path>       Override the default config");
     exit(code);
+}
+
+static void
+atoms(Display *display, Window win)
+{
+    /* TODO: fix and tidy up, but more importantly, fix (maybe try strut)
+       https://x.org/releases/X11R7.6/doc/xorg-docs/specs/ICCCM/icccm.html */
+       
+    Atom NET_WM_WINDOW_TYPE =  XInternAtom(display, "_NET_WM_WINDOW_TYPE", 0);
+    Atom NET_WM_STATE = XInternAtom(display, "_NET_WM_STATE", 0);
+    Atom NET_WM_WINDOW_TYPE_DOCK = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DOCK", 0);
+    Atom NET_WM_STATE_STICKY = XInternAtom(display, "_NET_WM_STATE_STICKY", 0);
+
+    XChangeProperty(display, win, NET_WM_WINDOW_TYPE, XA_ATOM, 32, 1, (const unsigned char *)&NET_WM_WINDOW_TYPE_DOCK, 1);
+    XChangeProperty(display, win, NET_WM_STATE, XA_ATOM, 32, 2, (const unsigned char *)&NET_WM_STATE_STICKY, 1);
+    XChangeProperty(display, win, XA_WM_NAME, XA_STRING, 8, 3, "par", 1);
+    XChangeProperty(display, win, XA_WM_CLASS, XA_STRING, 8, 7, "par\0Bar", 1);
+}
+
+static void
+run(Config *config)
+{
+    Display *display;
+    if (!(display = XOpenDisplay(NULL)))
+        panic("failed to open display, is X11 running?\n");
+
+    int screen = DefaultScreen(display);
+    Window root = XRootWindow(display, screen);
+
+    XSetWindowAttributes windowattributes;
+    windowattributes.override_redirect = 1;
+    windowattributes.background_pixel = 0x00000000;
+    windowattributes.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
+
+    /* TODO: pixmap and gc */
+    Window win = XCreateWindow(display, root, 0, 1440 - 24, 2560, 24, 0,
+                                CopyFromParent, CopyFromParent, CopyFromParent,
+                                CWBackPixel | CWBorderPixel | CWOverrideRedirect
+                                | CWEventMask | CWColormap,
+                                &windowattributes);
+    atoms(display, win);
+
+    XMapWindow(display, win);
+    XFlush(display);
+    XMapRaised(display, win);
+
+    for (;;) { }
 }
 
 int
@@ -59,7 +100,7 @@ main(int argc, char **argv)
             if (argc != 2 ) {
                 PANIC_USAGE("argument `%s` expects no arguments.\n", argv[i]);
             }
-            printf("par v%s\n", VERSION);
+            printf("par @commit %s\n", VERSION);
         } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--config")) {
             if (i == argc - 1) {
                 PANIC_USAGE("expected path after config, got nothing.\n");
