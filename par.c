@@ -37,17 +37,20 @@ atoms(Display *display, Window win)
     /* TODO: fix and tidy up, but more importantly, fix (maybe try strut)
        https://x.org/releases/X11R7.6/doc/xorg-docs/specs/ICCCM/icccm.html */
        
-    Atom NET_WM_WINDOW_TYPE =  XInternAtom(display, "_NET_WM_WINDOW_TYPE", 0);
+    Atom NET_WM_WINDOW_TYPE = XInternAtom(display, "_NET_WM_WINDOW_TYPE", 0);
     Atom NET_WM_STATE = XInternAtom(display, "_NET_WM_STATE", 0);
     Atom NET_WM_WINDOW_TYPE_DOCK = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DOCK", 0);
     Atom NET_WM_STATE_STICKY = XInternAtom(display, "_NET_WM_STATE_STICKY", 0);
 
-    XChangeProperty(display, win, NET_WM_WINDOW_TYPE, XA_ATOM, 32, 1, (const unsigned char *)&NET_WM_WINDOW_TYPE_DOCK, 1);
-    XChangeProperty(display, win, NET_WM_STATE, XA_ATOM, 32, 2, (const unsigned char *)&NET_WM_STATE_STICKY, 1);
+    XChangeProperty(display, win, NET_WM_WINDOW_TYPE, XA_ATOM, 32, 1,
+                    (const unsigned char *)&NET_WM_WINDOW_TYPE_DOCK, 1);
+    XChangeProperty(display, win, NET_WM_STATE, XA_ATOM, 32, 2,
+                    (const unsigned char *)&NET_WM_STATE_STICKY, 1);
     XChangeProperty(display, win, XA_WM_NAME, XA_STRING, 8, 3, "par", 1);
     XChangeProperty(display, win, XA_WM_CLASS, XA_STRING, 8, 7, "par\0Bar", 1);
 }
 
+/* TODO: move to separate window.c file */
 static void
 run(Config *config)
 {
