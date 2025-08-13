@@ -11,7 +11,6 @@ typedef enum {
 
 typedef union {
     char *text; /* MODULE_TEXT data */
-    time_t time; /* MODULE_CLOCK data */
 } ModuleData;
 
 typedef struct {
@@ -25,10 +24,11 @@ typedef struct {
 typedef struct {
     unsigned char position;
 
-    int padding;
+    int gaps;
     char separator;
+
     Module *left;
     Module *right;
 } Config;
 
-Config *config_parse(const char *path);
+Config *config_new(const char *path);

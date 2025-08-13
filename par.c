@@ -20,19 +20,20 @@
 static void
 run(Config *config)
 {
-
+    /* TODO: spawn X11 window, no decorations, fixed size */
+    (void)(config);
 }
 
 static void
 usage(int code)
 {
-    printf(
+    puts(
         "par, a minimalist X11 status bar.\n"
         "\n"
         "Usage: par <option(s)>\n"
         "\t-h (--help)                Show this text\n"
         "\t-v (--version)             Display the version\n"
-        "\t-c (--config) <path>       Override the default config\n");
+        "\t-c (--config) <path>       Override the default config");
     exit(code);
 }
 
@@ -45,9 +46,8 @@ main(int argc, char **argv)
     Config *config = NULL;
 
     for (int i = 1; i < argc; i++) {
-        /* TODO: figure out why i can't remove the braces from this if statement */
         if (config != NULL) {
-            PANIC_USAGE("expected no additional arguments after config has already been set.\n");
+            PANIC_USAGE("expected no additional arguments after config.\n");
         }
 
         if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
@@ -64,7 +64,7 @@ main(int argc, char **argv)
             if (i == argc - 1) {
                 PANIC_USAGE("expected path after config, got nothing.\n");
             }
-            config = config_parse(argv[i + 1]);
+            config = config_new(argv[i + 1]);
             i += 1;
         } else {
             PANIC_USAGE("invalid argument `%s`.\n", argv[i]);
