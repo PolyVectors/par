@@ -31,14 +31,12 @@ indents(const char *str)
 Config *
 config_new(const char *path)
 {
-    FILE *fd;
-    fd = fopen(path, "r");
-    if (fd == NULL) {
+    FILE *fd = fopen(path, "r");
+    if (fd == NULL)
         panic("file at path `%s` doesn't exist.\n", path);
-    }
 
     fseek(fd, 0, SEEK_END);
-    long filelength = ftell(fd) + 1; /* TODO: figure out why +1 is needed? */
+    long filelength = ftell(fd) + 1;
     fseek(fd, 0, SEEK_SET);
 
     char line[81];
@@ -54,15 +52,15 @@ config_new(const char *path)
         /* TODO: validate */
         i++;
     }
-    
-    if (fclose(fd) != 0) {
+
+    if (fclose(fd) != 0)
         panic("failed to close file at path `%s`\n", path);
-    }
 
     Config *config = malloc(sizeof(Config));
 
     /* placeholder */
     config->position = CONFIG_POSITION_TOP;
+    config ->height = 24;
 
     config->gaps = 0;
     config->separator = '|';

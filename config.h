@@ -1,6 +1,5 @@
 #include "time.h"
 
-/* TODO: try casting enum to char */
 #define CONFIG_POSITION_TOP (unsigned char)0
 #define CONFIG_POSITION_BOTTOM (unsigned char)1
 
@@ -10,21 +9,22 @@ typedef enum {
 } ModuleType;
 
 typedef union {
-    char *text; /* MODULE_TEXT data */
+    char *text;
 } ModuleData;
 
 typedef struct {
     ModuleType type;
     ModuleData data;
 
-    char *prefix, *suffix; /* if we are doing systray stuff, these can be null */
-    unsigned long foreground, background;
+    char *prefix, *suffix; /* nullable */
+    unsigned long foreground, background; /* also nullable */
 } Module;
 
 typedef struct {
     unsigned char position;
+    unsigned int height;
+    unsigned int gaps;
 
-    int gaps;
     char separator;
 
     Module *left;
