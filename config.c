@@ -57,12 +57,13 @@ config_new(const char *path)
         panic("failed to close file at path `%s`\n", path);
 
     Config *config = malloc(sizeof(Config));
-
+ 
     /* placeholder */
     config->position = CONFIG_POSITION_TOP;
     config ->height = 24;
-
     config->gaps = 0;
+    config->background = 0x00FFFFFF;
+
     config->separator = '|';
     config->left = NULL;
     config->right = NULL;

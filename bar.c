@@ -54,11 +54,17 @@ bar_create(Config *config)
     int screen = DefaultScreen(bar->display);
     Window root = XRootWindow(bar->display, screen);
 
-    /* TODO: colormap, gc, pixmap */
-    XSetWindowAttributes setattributes;
-    setattributes.override_redirect = 1;
-    setattributes.background_pixel = 0x00000000;
-    setattributes.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
+    Colormap colormap = XCreateColormap(bar->display, root,
+                                        DefaultVisual(bar->display, screen),
+                                        AllocNone);
+
+    /* TODO: gc, pixmap */
+    XSetWindowAttributes setattributes = {
+        .override_redirect = 1,
+        .colormap = colormap,
+        .background_pixel = config->background,
+        .event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask,
+    };
 
     XWindowAttributes attributes;
     if (!XGetWindowAttributes(bar->display, root, &attributes))

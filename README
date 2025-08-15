@@ -9,6 +9,6 @@ libc.so w/ headers
 inspirations
 ------------
 dmenu (https://tools.suckless.org/dmenu/)
-lemonbar (https://github.com/LemonBoy/bar)
 tint2 (https://gitlab.com/o9000/tint2)
+lemonbar (https://github.com/LemonBoy/bar)
 polybar (https://github.com/polybar/polybar)

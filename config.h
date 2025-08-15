@@ -25,6 +25,7 @@ typedef struct {
     unsigned int height;
     unsigned int gaps;
 
+    unsigned long background;
     char separator;
 
     Module *left;
