@@ -2,7 +2,6 @@
 
 typedef struct {
     Display *display;
-    XWindowAttributes attributes;
     Window window;
     unsigned int x, y, width, height;
 } Bar;

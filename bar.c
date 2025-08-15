@@ -65,8 +65,8 @@ bar_create(Config *config)
         panic("failed to get window attributes for root window");
     
     bar->x = 0;
-    bar->y = config->position ? bar->attributes.height - config->height : 0;
-    bar->width = bar->attributes.width;
+    bar->y = config->position ? attributes.height - config->height : 0;
+    bar->width = attributes.width;
     bar->height = config->height;
 
     bar->window = XCreateWindow(bar->display, root, bar->x, bar->y,
