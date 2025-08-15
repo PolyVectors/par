@@ -40,7 +40,9 @@ run(Config *config)
     bar = bar_create(config);
 
     /* TODO: exit gracefully upon CTRL-C to prevent leaks */
-    for (;;) { }
+    for (;;) {
+        XFlush(bar->dpy);
+    }
 
     free(bar);
 }

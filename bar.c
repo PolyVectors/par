@@ -70,8 +70,7 @@ bar_create(Config *config)
 
     Window win = XCreateWindow(dpy, root, bar->x, bar->y, bar->w, bar->h, 0,
                                 CopyFromParent, CopyFromParent, CopyFromParent,
-                                CWBackPixel | CWBorderPixel | CWOverrideRedirect
-                                | CWEventMask,
+                                CWBackPixel | CWBorderPixel | CWEventMask | CWColormap,
                                 &swa);
 
     bar->dpy = dpy;
