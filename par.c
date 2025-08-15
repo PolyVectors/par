@@ -41,7 +41,7 @@ run(Config *config)
 
     /* TODO: exit gracefully upon CTRL-C to prevent leaks */
     for (;;) {
-        XFlush(bar->dpy);
+        XFlush(bar->display);
     }
 
     free(bar);
