@@ -6,8 +6,7 @@
 #include "bar.h"
 #include "util.h"
 
-/* TODO: fix
-   https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
+/* https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
 static void
 setatoms(Bar *bar, Config *config)
 {
@@ -22,6 +21,8 @@ setatoms(Bar *bar, Config *config)
         strut[10] = 0;
         strut[11] = bar->wa.width;
     }
+
+    /* TODO: sticky, above */
 
     Atom _NET_WM_STRUT = XInternAtom(bar->dpy, "_NET_WM_STRUT", 0);
     Atom _NET_WM_STRUT_PARTIAL = XInternAtom(bar->dpy, "_NET_WM_STRUT", 0);
@@ -54,6 +55,7 @@ bar_create(Config *config)
     int screen = DefaultScreen(dpy);
     Window root = XRootWindow(dpy, screen);
 
+    /* TODO: colormap, gc, pixmap */
     XSetWindowAttributes swa;
     swa.override_redirect = 1;
     swa.background_pixel = 0x00000000;
@@ -78,8 +80,6 @@ bar_create(Config *config)
     bar->wa = wa;
 
     setatoms(bar, config);
-
-    /* TODO: configure window, pixmap, gc */
 
     XMapWindow(bar->dpy, bar->win);
     XFlush(bar->dpy);
