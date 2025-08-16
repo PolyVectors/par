@@ -101,11 +101,21 @@ bar_create(Config *config)
     return bar;
 }
 
+void
+bar_map(Bar *bar) {
+    XCopyArea(bar->display, bar->drawable, bar->window, bar->gc,
+              bar->x, bar->y, bar->width, bar->height, bar->x, bar->y);
+    XSync(bar->display, 0);
 
-/* TODO: why isn't this working */
+}
+
 void
 bar_draw(Bar *bar, Config *config)
 {
+    XSetForeground(bar->display, bar->gc, config->background);
+    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width, bar->height);
+
+    /* test rect */
     XSetForeground(bar->display, bar->gc, 0xFF000000);
-    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, 10, 10);
+    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width / 20, bar->height);
 }

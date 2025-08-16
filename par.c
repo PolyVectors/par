@@ -38,12 +38,19 @@ run(Config *config)
 {
     Bar *bar = bar_create(config);
 
+    /* TODO: switch to re-rendering once per frame, or per second */
     XEvent ev;
     while (!XNextEvent(bar->display, &ev)) {
         if (XFilterEvent(&ev, bar->window))
             continue;
 
-        bar_draw(bar, config);
+        /* bit redundant, as event mask only allows for this one event, for now */
+        switch (ev.type) {
+        case Expose:
+            bar_draw(bar, config);
+            bar_map(bar);
+            break;
+        }
     }
    
     free(bar);

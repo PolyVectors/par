@@ -10,3 +10,4 @@ typedef struct {
 
 Bar *bar_create(Config *config);
 void bar_draw(Bar *bar, Config *config);
+void bar_map(Bar *bar);
