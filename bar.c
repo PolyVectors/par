@@ -1,7 +1,9 @@
+#include <X11/X.h>
 #include <stdlib.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
 #include "bar.h"
 #include "util.h"
@@ -58,12 +60,10 @@ bar_create(Config *config)
                                         DefaultVisual(bar->display, screen),
                                         AllocNone);
 
-    /* TODO: gc, pixmap */
     XSetWindowAttributes setattributes = {
-        .override_redirect = 1,
         .colormap = colormap,
         .background_pixel = config->background,
-        .event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask,
+        .event_mask = ExposureMask
     };
 
     XWindowAttributes attributes;
@@ -78,14 +78,34 @@ bar_create(Config *config)
     bar->window = XCreateWindow(bar->display, root, bar->x, bar->y,
                                 bar->width, bar->height, 0,
                                 CopyFromParent, CopyFromParent, CopyFromParent,
-                                CWBackPixel | CWBorderPixel | CWEventMask | CWColormap,
-                                &setattributes);;
+                                CWColormap | CWBackPixel | CWEventMask,
+                                &setattributes);
+
+    XClassHint classhint = { "par", "par" };
+    XSetClassHint(bar->display, bar->window, &classhint);
+
+    bar->drawable = XCreatePixmap(bar->display, root, bar->width, bar->height,
+                                  DefaultDepth(bar->display, screen));
+
+    XGCValues gcv = {
+        .background = config->background,
+        .foreground = 0xFF000000 /* temporary value */
+    };
+    bar->gc = XCreateGC(bar->display, bar->drawable,
+                        GCBackground | GCForeground, &gcv);
 
     setatoms(bar, config);
 
-    XMapWindow(bar->display, bar->window);
-    XFlush(bar->display);
     XMapRaised(bar->display, bar->window);
 
     return bar;
+}
+
+
+/* TODO: why isn't this working */
+void
+bar_draw(Bar *bar, Config *config)
+{
+    XSetForeground(bar->display, bar->gc, 0xFF000000);
+    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, 10, 10);
 }

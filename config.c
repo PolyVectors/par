@@ -62,7 +62,7 @@ config_new(const char *path)
     config->position = CONFIG_POSITION_TOP;
     config ->height = 24;
     config->gaps = 0;
-    config->background = 0x00FFFFFF;
+    config->background = 0xFFFFFFFF;
 
     config->separator = '|';
     config->left = NULL;

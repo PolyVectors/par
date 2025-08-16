@@ -8,7 +8,7 @@ panic(const char *fmt, ...)
     va_list args;
     va_start (args, fmt);
 
-    fputs("\x1b[1;91merror\x1b[0m: ", stdout);
-    vprintf(fmt, args);
+    fputs("\x1b[1;91merror\x1b[0m: ", stderr);
+    vfprintf(stderr, fmt, args);
     exit(1);
 }

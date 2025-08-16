@@ -24,7 +24,6 @@ typedef struct {
     unsigned char position;
     unsigned int height;
     unsigned int gaps;
-
     unsigned long background;
     char separator;
 
