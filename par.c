@@ -1,11 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <X11/Xlib.h>
-
 #include "bar.h"
-#include "util.h"
 
 #ifndef VERSION
 #define VERSION "0.1.0"

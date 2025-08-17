@@ -1,9 +1,3 @@
-#include <stdlib.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xutil.h>
-
 #include "bar.h"
 #include "util.h"
 
