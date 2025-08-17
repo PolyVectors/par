@@ -1,4 +1,9 @@
-#include "time.h"
+#ifndef _CONFIG
+#define _CONFIG
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define CONFIG_POSITION_TOP (unsigned char)0
 #define CONFIG_POSITION_BOTTOM (unsigned char)1
@@ -32,3 +37,5 @@ typedef struct {
 } Config;
 
 Config *config_new(const char *path);
+
+#endif
