@@ -3,7 +3,7 @@ par, an elementary X11 status bar
 
 requirements
 ------------
-a c compiler (default is tcc (https://bellard.org/tcc/))
+a C compiler, default is zig (https://ziglang.org/)
 libX11.so w/ headers
 libc.so w/ headers
 

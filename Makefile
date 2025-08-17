@@ -1,12 +1,12 @@
 VERSION = $(shell test -d .git && git describe --always 2>/dev/null)
 
-CC = tcc
+CC = zig
 SRC = par.c bar.c config.c util.c
 
 CPPFLAGS = -DVERSION=\"$(VERSION)\"
-CFLAGS = -std=c99 -Wall -Werror -lX11 $(CPPFLAGS)
+CFLAGS = -lc -lX11 -O ReleaseSmall -fsingle-threaded $(CPPFLAGS)
 
 build:
-	$(CC) $(CFLAGS) $(SRC) -o par
+	$(CC) build-exe $(CFLAGS) $(SRC)
 
 .PHONY: build

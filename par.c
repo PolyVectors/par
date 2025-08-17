@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #ifndef VERSION
-#define VERSION "0.1.0"
+#define VERSION "unknown"
 #endif
 
 static void
