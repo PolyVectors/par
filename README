@@ -3,9 +3,10 @@ par, an elementary X11 status bar
 
 requirements
 ------------
-a C compiler, default is zig (https://ziglang.org/)
+a C compiler w/ a libc implementation, default is zig (https://ziglang.org/)
+
 libX11.so w/ headers
-libc.so w/ headers
+libXft.so w/ headers & freetype2 headers
 
 inspirations
 ------------

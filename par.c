@@ -1,5 +1,6 @@
 #include "bar.h"
 
+#include <X11/Xft/Xft.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -76,7 +77,7 @@ main(int argc, char **argv)
         } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--config")) {
             if (i == argc - 1)
                 panicusage("expected path after config, got nothing.\n");
-            config = config_new(argv[i + 1]);
+            config = config_parse(argv[i + 1]);
             i += 1;
         } else
             panicusage("invalid argument `%s`.\n", argv[i]);

@@ -1,4 +1,4 @@
-#include "config.h"
+#include "parse.h"
 #include "util.h"
 
 static unsigned char
@@ -12,20 +12,8 @@ whitespace(const char *str)
     return 1;
 }
 
-static unsigned char
-indents(const char *str)
-{
-    unsigned char indentation = 0;
-    for (size_t i = 0; i < strlen(str); i++)
-        if (str[i] == '\t' || str[i] == '\n' || str[i] == ' ')
-            indentation++;
-        else
-            return indentation;
-    return indentation;
-}
-
 Config *
-config_new(const char *path)
+config_parse(const char *path)
 {
     FILE *fd = fopen(path, "r");
     if (fd == NULL)
@@ -42,9 +30,6 @@ config_new(const char *path)
         if (whitespace(line))
             continue;
 
-        unsigned char indentation = indents(line);
-        (void)(indentation);
-
         /* TODO: validate */
         i++;
     }
@@ -56,7 +41,7 @@ config_new(const char *path)
  
     /* placeholder */
     config->position = CONFIG_POSITION_TOP;
-    config ->height = 24;
+    config ->height = 16;
     config->gaps = 0;
     config->background = 0xFFFFFFFF;
 

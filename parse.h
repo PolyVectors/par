@@ -1,5 +1,5 @@
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _PARSE_H
+#define _PARSE_H
 
 #include <stdio.h>
 #include <string.h>
@@ -36,6 +36,6 @@ typedef struct {
     Module *right;
 } Config;
 
-Config *config_new(const char *path);
+Config *config_parse(const char *path);
 
 #endif

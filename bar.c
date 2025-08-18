@@ -1,5 +1,6 @@
 #include "bar.h"
 #include "util.h"
+#include <X11/Xft/Xft.h>
 
 /* https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
 static void
@@ -46,15 +47,19 @@ bar_create(Config *config)
     if (!(bar->display = XOpenDisplay(NULL)))
         panic("failed to open display, is X11 running?\n");
 
-    int screen = DefaultScreen(bar->display);
-    Window root = XRootWindow(bar->display, screen);
+    /* TODO: check if this is fine */
+    bar->screen = DefaultScreen(bar->display);
+    bar->visual = DefaultVisual(bar->display, bar->screen);
+    bar->depth = DefaultDepth(bar->display, bar->screen); 
+    
+    Window root = XRootWindow(bar->display, bar->screen);
 
-    Colormap colormap = XCreateColormap(bar->display, root,
-                                        DefaultVisual(bar->display, screen),
-                                        AllocNone);
+    bar->colormap = XCreateColormap(bar->display, root,
+                                    bar->visual,
+                                    AllocNone);
 
     XSetWindowAttributes setattributes = {
-        .colormap = colormap,
+        .colormap = bar->colormap,
         .background_pixel = config->background,
         .event_mask = ExposureMask
     };
@@ -78,8 +83,9 @@ bar_create(Config *config)
     XSetClassHint(bar->display, bar->window, &classhint);
 
     bar->drawable = XCreatePixmap(bar->display, root, bar->width, bar->height,
-                                  DefaultDepth(bar->display, screen));
+                                  bar->depth);
 
+    /* TODO: is this really necessary? */
     XGCValues gcv = {
         .background = config->background,
         .foreground = 0xFF000000 /* temporary value */
@@ -108,7 +114,7 @@ bar_draw(Bar *bar, Config *config)
     XSetForeground(bar->display, bar->gc, config->background);
     XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width, bar->height);
 
-    /* test rect */
+    /* TODO learn how to use freetype */
     XSetForeground(bar->display, bar->gc, 0xFF000000);
-    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width / 20, bar->height);
+    XftDrawCreate(bar->display, bar->drawable, bar->visual, bar->colormap);
 }

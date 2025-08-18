@@ -6,14 +6,21 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#include <X11/Xft/Xft.h>
 
-#include "config.h"
+#include "parse.h"
 
 typedef struct {
     Display *display;
+    int screen;
+    int depth;
+    Visual *visual;
     Window window;
+
+    Colormap colormap;
     Pixmap drawable;
     GC gc;
+
     unsigned int x, y, width, height;
 } Bar;
 
