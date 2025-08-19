@@ -1,6 +1,5 @@
 #include "bar.h"
 #include "util.h"
-#include <X11/Xft/Xft.h>
 
 /* https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
 static void
@@ -104,8 +103,6 @@ void
 bar_map(Bar *bar) {
     XCopyArea(bar->display, bar->drawable, bar->window, bar->gc,
               bar->x, bar->y, bar->width, bar->height, bar->x, bar->y);
-    XSync(bar->display, 0);
-
 }
 
 void
@@ -114,7 +111,8 @@ bar_draw(Bar *bar, Config *config)
     XSetForeground(bar->display, bar->gc, config->background);
     XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width, bar->height);
 
-    /* TODO learn how to use freetype */
     XSetForeground(bar->display, bar->gc, 0xFF000000);
-    XftDrawCreate(bar->display, bar->drawable, bar->visual, bar->colormap);
+    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, 10, bar->height);
+    
+    /* TODO learn how to use freetype */
 }

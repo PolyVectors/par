@@ -38,21 +38,28 @@ run(Config *config)
 {
     Bar *bar = bar_create(config);
 
-    /* TODO: switch to re-rendering once per frame, or per second */
+    /* TODO: change to update less frequently, e.g. once every 1/10 to 1 second */
     XEvent ev;
-    while (!XNextEvent(bar->display, &ev)) {
-        if (XFilterEvent(&ev, bar->window))
-            continue;
+    for (;;) {
+        while (XPending(bar->display)) {
+            XNextEvent(bar->display, &ev);
+            
+            if (XFilterEvent(&ev, bar->window))
+                continue;
 
-        /* bit redundant as event mask only allows for this one event, for now */
-        switch (ev.type) {
-        case Expose:
-            bar_draw(bar, config);
-            bar_map(bar);
-            break;
+            switch (ev.type) {
+            case DestroyNotify:
+                printf("TEST!\n");
+            }
+
+            /* TODO: close window event for cleanup? */
         }
+
+        bar_map(bar);
+        bar_draw(bar, config);
     }
-   
+
+    /* TODO: this is never reached, handle cleanup if CTRL-C isn't sufficient */
     free(bar);
 }
 
@@ -86,6 +93,8 @@ main(int argc, char **argv)
         return 0;
 
     run(config);
+
+    /* TODO: this is ALSO never reached, ditto */
     free(config);
 
     return 0;
