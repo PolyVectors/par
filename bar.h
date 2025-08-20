@@ -11,6 +11,11 @@
 #include "parse.h"
 
 typedef struct {
+    XftFont *font;
+
+    XftColor foreground;
+    XftColor background;
+
     Display *display;
     int screen;
     int depth;

@@ -1,5 +1,6 @@
 #include "bar.h"
 #include "util.h"
+#include <X11/Xft/Xft.h>
 
 /* https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
 static void
@@ -57,9 +58,16 @@ bar_create(Config *config)
                                     bar->visual,
                                     AllocNone);
 
+    bar->font = XftFontOpenName(bar->display, bar->screen, config->font);
+
+    XftColorAllocName(bar->display, bar->visual, bar->colormap,
+                      config->background, &bar->background);
+    XftColorAllocName(bar->display, bar->visual, bar->colormap,
+                      config->foreground, &bar->foreground);
+    
     XSetWindowAttributes setattributes = {
         .colormap = bar->colormap,
-        .background_pixel = config->background,
+        .background_pixel = bar->background.pixel,
         .event_mask = ExposureMask
     };
 
@@ -86,7 +94,7 @@ bar_create(Config *config)
 
     /* TODO: is this really necessary? */
     XGCValues gcv = {
-        .background = config->background,
+        .background = bar->background.pixel,
         .foreground = 0xFF000000 /* temporary value */
     };
     bar->gc = XCreateGC(bar->display, bar->drawable,
@@ -107,12 +115,19 @@ bar_map(Bar *bar) {
 
 void
 bar_draw(Bar *bar, Config *config)
-{
-    XSetForeground(bar->display, bar->gc, config->background);
+{  
+    XSetForeground(bar->display, bar->gc, bar->background.pixel);
     XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width, bar->height);
 
-    XSetForeground(bar->display, bar->gc, 0xFF000000);
-    XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, 10, bar->height);
-    
-    /* TODO learn how to use freetype */
+    /* IT'S ALL TEMPORARY */
+    XftDraw *draw = XftDrawCreate(bar->display, bar->drawable, bar->visual, bar->colormap);
+   
+    /* TODO: figure out why this prevents leaks as opposed to doing it in bar_create
+       TODO: free */
+    bar->font = XftFontOpenName(bar->display, bar->screen, config->font);
+
+    unsigned int y = bar->height - (bar->height - (bar->font->ascent - bar->font->descent)) / 2;
+    XftDrawStringUtf8(draw, &bar->foreground, bar->font, 2, y, (XftChar8 *)"Hello, world!", 13);
+
+    XftDrawDestroy(draw);
 }

@@ -40,10 +40,14 @@ config_parse(const char *path)
     Config *config = malloc(sizeof(Config));
  
     /* placeholder */
+    config->font = "Spleen32x64:size=8";
+    
+    config->foreground = "#000000";
+    config->background = "#FFFFFF";
+    
     config->position = CONFIG_POSITION_TOP;
     config ->height = 16;
     config->gaps = 0;
-    config->background = 0xFFFFFFFF;
 
     config->separator = '|';
     config->left = NULL;

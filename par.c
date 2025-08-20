@@ -38,28 +38,18 @@ run(Config *config)
 {
     Bar *bar = bar_create(config);
 
-    /* TODO: change to update less frequently, e.g. once every 1/10 to 1 second */
     XEvent ev;
     for (;;) {
         while (XPending(bar->display)) {
             XNextEvent(bar->display, &ev);
-            
             if (XFilterEvent(&ev, bar->window))
                 continue;
-
-            switch (ev.type) {
-            case DestroyNotify:
-                printf("TEST!\n");
-            }
-
-            /* TODO: close window event for cleanup? */
         }
 
-        bar_map(bar);
         bar_draw(bar, config);
+        bar_map(bar);
     }
 
-    /* TODO: this is never reached, handle cleanup if CTRL-C isn't sufficient */
     free(bar);
 }
 

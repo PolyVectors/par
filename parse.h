@@ -26,10 +26,14 @@ typedef struct {
 } Module;
 
 typedef struct {
+    const char *font;
+    const char *foreground;
+    const char *background;
+
     unsigned char position;
     unsigned int height;
     unsigned int gaps;
-    unsigned long background;
+
     char separator;
 
     Module *left;
