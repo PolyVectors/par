@@ -5,5 +5,5 @@ CC = zig build-exe
 CPPFLAGS = -DVERSION=\"$(VERSION)\"
 CFLAGS = -I/usr/include/freetype2 \
 		-lc -lX11 -lXft \
-		-O ReleaseSmall -fsingle-threaded \
+		-O ReleaseFast \
 		$(CPPFLAGS)

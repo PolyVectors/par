@@ -1,9 +1,11 @@
 #include "bar.h"
 
-#include <X11/Xft/Xft.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
+#include <X11/Xft/Xft.h>
 
 #ifndef VERSION
 #define VERSION "unknown"
@@ -38,7 +40,9 @@ run(Config *config)
 {
     Bar *bar = bar_create(config);
 
+    time_t last = 0;
     XEvent ev;
+
     for (;;) {
         while (XPending(bar->display)) {
             XNextEvent(bar->display, &ev);
@@ -46,10 +50,17 @@ run(Config *config)
                 continue;
         }
 
-        bar_draw(bar, config);
-        bar_map(bar);
+        time_t now = time(NULL);
+        if (now - last >= 1) {
+            bar_draw(bar, config);
+            bar_map(bar);
+            last = now;
+        }
+
+        nanosleep(&(struct timespec){0, 100000000}, NULL);
     }
 
+    /* TODO: never reached, fix */
     free(bar);
 }
 
@@ -70,7 +81,7 @@ main(int argc, char **argv)
         } else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
             if (argc != 2 )
                 panicusage("argument `%s` expects no arguments.\n", argv[i]);
-            printf("par @commit %s\n", VERSION);
+            printf("par git-%s\n", VERSION);
         } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--config")) {
             if (i == argc - 1)
                 panicusage("expected path after config, got nothing.\n");
@@ -83,7 +94,7 @@ main(int argc, char **argv)
         return 0;
 
     run(config);
-
+ 
     /* TODO: this is ALSO never reached, ditto */
     free(config);
 

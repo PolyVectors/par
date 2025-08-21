@@ -91,14 +91,7 @@ bar_create(Config *config)
 
     bar->drawable = XCreatePixmap(bar->display, root, bar->width, bar->height,
                                   bar->depth);
-
-    /* TODO: is this really necessary? */
-    XGCValues gcv = {
-        .background = bar->background.pixel,
-        .foreground = 0xFF000000 /* temporary value */
-    };
-    bar->gc = XCreateGC(bar->display, bar->drawable,
-                        GCBackground | GCForeground, &gcv);
+    bar->gc = XCreateGC(bar->display, bar->drawable, 0, NULL);
 
     setatoms(bar, config);
 
