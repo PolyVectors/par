@@ -41,8 +41,8 @@ run(Config *config)
     Bar *bar = bar_create(config);
 
     time_t last = 0;
+    
     XEvent ev;
-
     for (;;) {
         while (XPending(bar->display)) {
             XNextEvent(bar->display, &ev);

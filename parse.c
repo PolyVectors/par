@@ -40,14 +40,15 @@ config_parse(const char *path)
     Config *config = malloc(sizeof(Config));
  
     /* placeholder */
-    config->font = "Spleen32x64:size=8";
+    config->font = "Fairfax:size=8";
     
-    config->foreground = "#000000";
-    config->background = "#FFFFFF";
-    
-    config->position = CONFIG_POSITION_TOP;
+    config->foreground = "#FFFFFF";
+    config->background = "#000000";
+
+    /* TODO: fix no rendering w/ bottom config */
+    config->position = CONFIG_POSITION_BOTTOM;
     config ->height = 16;
-    config->gaps = 0;
+    config->gaps = 4;
 
     config->separator = '|';
     config->left = NULL;

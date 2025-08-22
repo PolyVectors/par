@@ -1,5 +1,7 @@
 #include "bar.h"
+#include "parse.h"
 #include "util.h"
+#include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
 
 /* https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
@@ -14,30 +16,21 @@ setatoms(Bar *bar, Config *config)
         strut[9] = bar->x + bar->width - 1;
     } else {
         strut[3] = bar->height;
-        strut[10] = 0;
+        strut[10] = bar->x;
         strut[11] = bar->width;
     }
 
     /* TODO: sticky, above */
 
-    Atom _NET_WM_STRUT = XInternAtom(bar->display, "_NET_WM_STRUT", 0);
-    Atom _NET_WM_STRUT_PARTIAL = XInternAtom(bar->display, "_NET_WM_STRUT", 0);
+    Atom _NET_WM_STRUT_PARTIAL = XInternAtom(bar->display, "_NET_WM_STRUT_PARITAL", 0);
     Atom _NET_WM_WINDOW_TYPE = XInternAtom(bar->display, "_NET_WM_WINDOW_TYPE", 0);
     Atom _NET_WM_WINDOW_TYPE_DOCK = XInternAtom(bar->display, "_NET_WM_WINDOW_TYPE_DOCK", 0);
-    Atom _MOTIF_WM_HINTS = XInternAtom(bar->display, "_MOTIF_WM_HINTS", 0);
 
     XChangeProperty(bar->display, bar->window, _NET_WM_WINDOW_TYPE, XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)&_NET_WM_WINDOW_TYPE_DOCK, 1);
-
-    long prop[5] = {2, 0, 0, 0, 0};
-    XChangeProperty(bar->display, bar->window, _MOTIF_WM_HINTS, _MOTIF_WM_HINTS, 32,
-                    PropModeReplace, (unsigned char *)prop, 5);
-
     XChangeProperty(bar->display, bar->window, _NET_WM_STRUT_PARTIAL, XA_CARDINAL, 32,
                     PropModeReplace, (unsigned char *)&strut, 12);
-    XChangeProperty(bar->display, bar->window, _NET_WM_STRUT, XA_CARDINAL, 32,
-                    PropModeReplace, (unsigned char *)&strut, 4);
-}
+ }
 
 Bar *
 bar_create(Config *config)
@@ -76,7 +69,7 @@ bar_create(Config *config)
         panic("failed to get window attributes for root window");
     
     bar->x = 0;
-    bar->y = config->position ? attributes.height - config->height : 0;
+    bar->y = config->position == CONFIG_POSITION_TOP ? 0 :attributes.height - config->height;
     bar->width = attributes.width;
     bar->height = config->height;
 
@@ -86,6 +79,7 @@ bar_create(Config *config)
                                 CWColormap | CWBackPixel | CWEventMask,
                                 &setattributes);
 
+    XStoreName(bar->display, bar->window, "par");
     XClassHint classhint = { "par", "par" };
     XSetClassHint(bar->display, bar->window, &classhint);
 
@@ -108,7 +102,7 @@ bar_map(Bar *bar) {
 
 void
 bar_draw(Bar *bar, Config *config)
-{  
+{
     XSetForeground(bar->display, bar->gc, bar->background.pixel);
     XFillRectangle(bar->display, bar->drawable, bar->gc, 0, 0, bar->width, bar->height);
 
@@ -119,8 +113,8 @@ bar_draw(Bar *bar, Config *config)
        TODO: free */
     bar->font = XftFontOpenName(bar->display, bar->screen, config->font);
 
-    unsigned int y = bar->height - (bar->height - (bar->font->ascent - bar->font->descent)) / 2;
-    XftDrawStringUtf8(draw, &bar->foreground, bar->font, 2, y, (XftChar8 *)"Hello, world!", 13);
+    int y = bar->height - (bar->height - (bar->font->ascent - bar->font->descent)) / 2;
+    XftDrawStringUtf8(draw, &bar->foreground, bar->font, config->gaps / 2, y, (XftChar8 *)"Hello, world!", 13);
 
     XftDrawDestroy(draw);
 }
