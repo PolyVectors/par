@@ -97,7 +97,7 @@ bar_create(Config *config)
 void
 bar_map(Bar *bar) {
     XCopyArea(bar->display, bar->drawable, bar->window, bar->gc,
-              bar->x, bar->y, bar->width, bar->height, bar->x, bar->y);
+              0, 0, bar->width, bar->height, 0, 0);
 }
 
 void
