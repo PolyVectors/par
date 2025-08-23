@@ -11,17 +11,27 @@ lex_config(const char *path)
     long filelength = ftell(fd) + 1;
     fseek(fd, 0, SEEK_SET);
 
-    char line[81];
-    int i = 0;
+    char *source = calloc(filelength + 1, sizeof(char));
+    fread(source, sizeof(char), filelength, fd);
+    
+    Token *tokens = malloc(sizeof(Token));
+    size_t i = 0;
+    
+    while (i < filelength) {
+        switch (source[i]) {
+        /* TODO: add cases for tokens */
+        case ' ':
+        case '\t':
+        case '\n':
+            break;
+        }
 
-    Token *tokens = calloc(1, sizeof(Token));
-    while(fgets(line, filelength, fd)) {
-        /* TODO: make some tokens */
         i++;
     }
-
+    
     if (fclose(fd) != 0)
         panic("failed to close file at path `%s`\n", path);
 
+    free(source);
     return tokens;
 }
