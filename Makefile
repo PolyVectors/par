@@ -1,6 +1,6 @@
 include config.mk
 
-SRC = par.c bar.c parse.c util.c
+SRC = par.c bar.c parse.c lex.c util.c
 
 build:
 	$(CC) $(CFLAGS) $(SRC)
