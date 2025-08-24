@@ -86,9 +86,9 @@ main(int argc, char **argv)
             if (i == argc - 1)
                 panicusage("expected path after config, got nothing.\n");
 
-            Token *tokens = lex_config(argv[i + 1]);
+            Tokens tokens = lex_config(argv[i + 1]);
             config = parse_config(tokens);
-            free(tokens);
+            lex_tokens_free(&tokens);
             
             i += 1;
         } else

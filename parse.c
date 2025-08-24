@@ -1,7 +1,7 @@
 #include "parse.h"
 
 Config *
-parse_config(Token *tokens)
+parse_config(Tokens tokens)
 {
     Config *config = malloc(sizeof(Config));
  

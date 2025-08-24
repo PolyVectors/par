@@ -16,6 +16,14 @@ typedef struct {
     char *value;
 } Token;
 
-Token *lex_config(const char *parse);
+/* https://x.com/tsoding/status/1898807595168575589 */
+typedef struct {
+    Token *array;
+    size_t capacity;
+    size_t count;
+} Tokens;
+
+void lex_tokens_free(Tokens *tokens);
+Tokens lex_config(const char *parse);
 
 #endif

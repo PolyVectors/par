@@ -38,6 +38,6 @@ typedef struct {
     Module *right;
 } Config;
 
-Config *parse_config(Token *tokens);
+Config *parse_config(Tokens tokens);
 
 #endif
