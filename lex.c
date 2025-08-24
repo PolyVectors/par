@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "lex.h"
 #include "util.h"
@@ -30,7 +31,36 @@ lex_tokens_free(Tokens *tokens)
     tokens->capacity = tokens->count = 0;
 }
 
-static size_t pos = 0;
+static char *source;
+static size_t pos;
+static long filelength;
+
+static void
+pushcurly(Tokens *tokens)
+{
+    tokens_push(tokens,
+                (Token){ .type = source[pos] == '{' ? TT_LCurly : TT_RCurly });
+}
+
+static void
+pushstring(Tokens *tokens)
+{
+    if (pos + 1 >= filelength)
+        panic("Unclosed string while lexing.\n");
+
+    pos++;
+    size_t startpos = pos;
+
+    while (pos < filelength) {
+        if (source[pos] == '"')
+            break;
+        pos++;
+    }
+
+    Token token = { .type = TT_String };
+    strncpy(token.value, source + startpos, pos - startpos);
+    tokens_push(tokens, token);
+}
 
 Tokens
 lex_config(const char *path)
@@ -40,10 +70,10 @@ lex_config(const char *path)
         panic("file at path `%s` doesn't exist.\n", path);
 
     fseek(fd, 0, SEEK_END);
-    long filelength = ftell(fd) + 1;
+    filelength = ftell(fd);
     fseek(fd, 0, SEEK_SET);
 
-    char *source = calloc(filelength, sizeof(char));
+    source = calloc(filelength, sizeof(char));
     fread(source, sizeof(char), filelength, fd);
 
     if (fclose(fd) != 0)
@@ -59,18 +89,18 @@ lex_config(const char *path)
         case '\n':
             break;
         case '{':
-            tokens_push(&tokens, (Token){ .type = TT_LCurly });
-            break;
         case '}':
-            tokens_push(&tokens, (Token){ .type = TT_RCurly });
+            pushcurly(&tokens);
+            break;
+        case '"':
+            pushstring(&tokens);
             break;
         /* TODO: more cases */
         default:
             /* this will be a panic when the lexer is finished */
-            printf("Unrecognized character: `%c` while lexing\n", source[pos]);
+            printf("Unrecognized character: `%c` while lexing.\n", source[pos]);
             break;
         }
-
         pos++;
     }
 

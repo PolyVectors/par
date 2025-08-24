@@ -6,11 +6,12 @@
 typedef enum {
     TT_LCurly,
     TT_RCurly,
+    TT_String
 } TokenType;
 
 typedef struct {
     TokenType type;
-    char *value;
+    char value[80];
 } Token;
 
 /* https://x.com/tsoding/status/1898807595168575589 */
