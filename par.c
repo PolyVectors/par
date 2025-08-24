@@ -1,11 +1,11 @@
-#include "bar.h"
-
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
 #include <X11/Xft/Xft.h>
+
+#include "bar.h"
 
 #ifndef VERSION
 #define VERSION "unknown"

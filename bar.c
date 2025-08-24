@@ -1,8 +1,9 @@
+#include <X11/Xatom.h>
+#include <X11/Xft/Xft.h>
+
 #include "bar.h"
 #include "parse.h"
 #include "util.h"
-#include <X11/Xatom.h>
-#include <X11/Xft/Xft.h>
 
 /* https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html */
 static void

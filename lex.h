@@ -1,10 +1,7 @@
 #ifndef _LEX_H
 #define _LEX_H
 
-#include <stdio.h>
 #include <stdlib.h>
-
-#include "util.h"
 
 typedef enum {
     TT_LCurly,

@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 #include "lex.h"
+#include "util.h"
 
 static void
 tokens_create(Tokens *tokens)

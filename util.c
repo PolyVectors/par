@@ -1,3 +1,7 @@
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "util.h"
 
 void

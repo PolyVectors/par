@@ -1,10 +1,6 @@
 #ifndef _PARSE_H
 #define _PARSE_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include "lex.h"
 
 #define CONFIG_POSITION_TOP (unsigned char) 0
