@@ -98,15 +98,15 @@ lex_config(const char *path)
             break;
         case '{':
         case '}':
-            tokens_push(&tokens, (Token){ .type = source[pos] == '{'
-                                                ? TT_LCurly
-                                                : TT_RCurly });
+            tokens_push(&tokens, (Token){
+                .type = source[pos] == '{' ? TT_LCurly : TT_RCurly
+            });
             break;
         case '[':
         case ']':
-            tokens_push(&tokens, (Token){ .type = source[pos] == '['
-                                                ? TT_LBracket
-                                                : TT_RBracket });
+            tokens_push(&tokens, (Token){
+                .type = source[pos] == '[' ? TT_LBracket : TT_RBracket
+            });
             break;
         case ':':
             tokens_push(&tokens, (Token){ .type = TT_Colon });
