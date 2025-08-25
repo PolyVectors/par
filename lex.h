@@ -6,7 +6,12 @@
 typedef enum {
     TT_LCurly,
     TT_RCurly,
-    TT_String
+    TT_LBracket,
+    TT_RBracket,
+    TT_Number,
+    TT_String,
+    TT_Colon,
+    TT_Comma
 } TokenType;
 
 typedef struct {

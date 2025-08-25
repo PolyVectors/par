@@ -5,7 +5,7 @@
 #include "util.h"
 
 static void
-tokens_create(Tokens *tokens)
+tokens_init(Tokens *tokens)
 {
     tokens->array = malloc(sizeof(Token));
     tokens->capacity = 1;
@@ -16,7 +16,7 @@ static void
 tokens_push(Tokens *tokens, Token token)
 {
     if (tokens->capacity >= tokens->count) {
-        tokens->capacity *= 2;
+        tokens->capacity += 5;
         tokens->array = realloc(tokens->array,
                                 tokens->capacity * sizeof(Token));
     }
@@ -31,16 +31,9 @@ lex_tokens_free(Tokens *tokens)
     tokens->capacity = tokens->count = 0;
 }
 
+static long filelength;
 static char *source;
 static size_t pos;
-static long filelength;
-
-static void
-pushcurly(Tokens *tokens)
-{
-    tokens_push(tokens,
-                (Token){ .type = source[pos] == '{' ? TT_LCurly : TT_RCurly });
-}
 
 static void
 pushstring(Tokens *tokens)
@@ -62,6 +55,21 @@ pushstring(Tokens *tokens)
     tokens_push(tokens, token);
 }
 
+static void
+pushnumber(Tokens *tokens)
+{
+    size_t startpos = pos;
+    while (pos < filelength) {
+        if (source[pos] > '9' || source[pos] < '0')
+            break;
+        pos++;
+    }
+
+    Token token = { .type = TT_Number };
+    strncpy(token.value, source + startpos, pos - startpos);
+    tokens_push(tokens, token);
+}
+
 Tokens
 lex_config(const char *path)
 {
@@ -78,9 +86,9 @@ lex_config(const char *path)
 
     if (fclose(fd) != 0)
         panic("failed to close file at path `%s`\n", path);
-    
+
     Tokens tokens;
-    tokens_create(&tokens);
+    tokens_init(&tokens);
     
     while (pos < filelength) {
         switch (source[pos]) {
@@ -90,16 +98,30 @@ lex_config(const char *path)
             break;
         case '{':
         case '}':
-            pushcurly(&tokens);
+            tokens_push(&tokens, (Token){ .type = source[pos] == '{'
+                                                ? TT_LCurly
+                                                : TT_RCurly });
+            break;
+        case '[':
+        case ']':
+            tokens_push(&tokens, (Token){ .type = source[pos] == '['
+                                                ? TT_LBracket
+                                                : TT_RBracket });
+            break;
+        case ':':
+            tokens_push(&tokens, (Token){ .type = TT_Colon });
+            break;
+        case ',':
+            tokens_push(&tokens, (Token){ .type = TT_Comma });
             break;
         case '"':
             pushstring(&tokens);
             break;
-        /* TODO: more cases */
         default:
-            /* this will be a panic when the lexer is finished */
-            printf("Unrecognized character: `%c` while lexing.\n", source[pos]);
-            break;
+            if (source[pos] >= '0' || source[pos] <= '9')
+                pushnumber(&tokens);
+            else
+                panic("Unexpected character `%c` while lexing", source[pos]);
         }
         pos++;
     }
