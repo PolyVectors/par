@@ -20,9 +20,9 @@ typedef struct {
 } Module;
 
 typedef struct {
-    const char *font;
-    const char *foreground; /* default value */
-    const char *background;
+    char font[81];
+    char foreground[8]; /* default value */
+    char background[8];
 
     unsigned char position;
     unsigned int height;

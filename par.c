@@ -73,7 +73,7 @@ main(int argc, char **argv)
 
     for (int i = 1; i < argc; i++) {
         if (config != NULL)
-                panicusage("expected no additional arguments after config.\n");
+            panicusage("expected no additional arguments after config.\n");
         else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             if (argc != 2 )
                 panicusage("argument `%s` expects no arguments.\n", argv[i]);
@@ -81,7 +81,7 @@ main(int argc, char **argv)
         } else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
             if (argc != 2 )
                 panicusage("argument `%s` expects no arguments.\n", argv[i]);
-            printf("par git-%s\n", VERSION);
+            printf("par @git-%s\n", VERSION);
         } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--config")) {
             if (i == argc - 1)
                 panicusage("expected path after config, got nothing.\n");

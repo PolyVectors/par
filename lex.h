@@ -16,7 +16,7 @@ typedef enum {
 
 typedef struct {
     TokenType type;
-    char value[80];
+    char value[81];
 } Token;
 
 /* https://x.com/tsoding/status/1898807595168575589 */
