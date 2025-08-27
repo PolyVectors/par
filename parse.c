@@ -11,18 +11,17 @@ static size_t pos = 0;
 static void
 parse_object(Tokens tokens, Config *config)
 {
-    unsigned char root = 0;
-    if (pos == 0)
-        root = 1;
-    
+    unsigned char root = pos == 0;
+    pos++;
+
     while (pos < tokens.count) {
         switch (tokens.array[pos].type) {
         case TT_LCurly:
-            pos++;
             parse_object(tokens, config);
             break;
         case TT_String:
-            if (pos + 2 < tokens.count
+            if (root
+                && pos + 2 < tokens.count
                 && tokens.array[pos + 1].type == TT_Colon
                 && (tokens.array[pos + 2].type == TT_String
                     || tokens.array[pos + 2].type == TT_Number
