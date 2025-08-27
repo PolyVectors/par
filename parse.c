@@ -6,6 +6,17 @@
 #include "lex.h"
 #include "util.h"
 
+#define FONT_DEFINITION          (1 << 0)
+#define BACKGROUND_DEFINITION    (1 << 1)
+#define FOREGROUND_DEFINITION    (1 << 2)
+#define POSITION_DEFINITION      (1 << 3)
+#define HEIGHT_DEFINITION        (1 << 4)
+#define GAPS_DEFINITION          (1 << 5)
+#define SEPARATOR_DEFINITION     (1 << 6)
+
+#define DEFINITIONS              7
+static unsigned char defined = 0;
+
 static size_t pos = 0;
 
 static void
@@ -30,17 +41,23 @@ parse_object(Tokens tokens, Config *config)
                 char *identifier = tokens.array[pos].value;
                 char *value = tokens.array[pos + 2].value;
                 
-                if (!strcmp(identifier, "font")) 
+                if (!strcmp(identifier, "font")) {
                     strcpy(config->font, value);
-                else if (!strcmp(identifier, "foreground")
+                    defined |= FONT_DEFINITION;
+                } else if (!strcmp(identifier, "foreground")
                          || !strcmp(identifier, "background")
                 ) {
-                    if (strlen(value) != 7)
+                    if (strlen(value) != 7
+                        || tokens.array[pos + 2].type != TT_String)
                         panic("identifier \"%s\" requires a hexadecimal string (i.e. #FFFFFF), got `%s`.\n",
                               identifier, value);
-                    strcpy(!strcmp(identifier, "foreground")
-                            ? config->foreground
-                            : config->background, value);
+
+                    int foreground = !strcmp(identifier, "foreground");
+
+                    strcpy(foreground ? config->foreground
+                                      : config->background, value);
+                    defined |= foreground ? FOREGROUND_DEFINITION
+                                          : BACKGROUND_DEFINITION;
                 } else if (!strcmp(identifier, "position")) {
                     if (strcmp(value, "top") && strcmp(value, "bottom"))
                         panic("identifier \"position\" expects either a string top or bottom, got `%s`.\n",
@@ -48,13 +65,31 @@ parse_object(Tokens tokens, Config *config)
                     config->position = !strcmp(value, "bottom")
                                         ? CONFIG_POSITION_BOTTOM
                                         : CONFIG_POSITION_TOP;
-                } else if (!strcmp(identifier, "height")) {
+                    defined |= POSITION_DEFINITION;
+                } else if (!strcmp(identifier, "height")
+                           || !strcmp(identifier, "gaps")
+                ) {
                     if (tokens.array[pos + 2].type != TT_Number)
                         panic("identifier \"height\" expects a number, got `%s`.\n",
                               value);
-                    config->height = atoi(value);
+                   
+                    if (!strcmp(identifier, "height")) {
+                        config->height = atoi(value);
+                        defined |= HEIGHT_DEFINITION;
+                    } else {
+                        config->gaps = atoi(value);
+                        defined |= GAPS_DEFINITION;
+                    }
+
+                } else if (!strcmp(identifier, "separator")) {
+                    if (tokens.array[pos + 2].type != TT_String
+                        || strlen(value) != 1)
+                        panic("identifier \"separator\" expects a single character, got `%s`.\n",
+                              value);
+                    config->separator = value[0];
+                    defined |= SEPARATOR_DEFINITION;
                 }
-                // TODO: gaps, separator, left-modules, right-modules
+                /* TODO: left-modules, right-modules */
             }
             break;
         default:
@@ -72,29 +107,44 @@ parse_config(Tokens tokens)
 
     while (pos < tokens.count) {
         switch (tokens.array[pos].type) {
-            case TT_LCurly:
-                parse_object(tokens, config);
-                break;
-            default:
-                break;
+        case TT_LCurly:
+            parse_object(tokens, config);
+            break;
+        default:
+            break;
         }
         pos++;
     }
 
-    /* placeholder */
-    if (!config->font[0])
-        strcpy(config->font, "monospace:size=8");
+    int i = DEFINITIONS;
+    while (i--) {
+        if (((1 << i) & defined) == (1 << i))
+            continue;
 
-    if (!config->foreground[0])
-        strcpy(config->foreground, "#FFFFFF");
-    if (!config->background[0])
-        strcpy(config->background, "#000000");
-
-    if (!config->height)
-        config ->height = 16;
-
-    config->gaps = 4;
-    config->separator = '|';
+        switch ((1 << i)) {
+        case FONT_DEFINITION:
+            strcpy(config->font, "monospace:size=8");
+            break;
+        case BACKGROUND_DEFINITION:
+            strcpy(config->background, "#FFFFFF");
+            break;
+        case FOREGROUND_DEFINITION:
+            strcpy(config->foreground, "#000000");
+            break;
+        case POSITION_DEFINITION:
+            config->position = CONFIG_POSITION_TOP;
+            break;
+        case HEIGHT_DEFINITION:
+            config->height = 16;
+            break;
+        case GAPS_DEFINITION:
+            config->gaps = 2;
+            break;
+        case SEPARATOR_DEFINITION:
+            config->separator = '|';
+            break;
+        }
+    }
 
     config->left = NULL;
     config->right = NULL;

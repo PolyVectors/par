@@ -3,8 +3,8 @@
 
 #include "lex.h"
 
-#define CONFIG_POSITION_TOP (unsigned char) 0
-#define CONFIG_POSITION_BOTTOM (unsigned char) 1
+#define CONFIG_POSITION_TOP       (unsigned char) 0
+#define CONFIG_POSITION_BOTTOM    (unsigned char) 1
 
 typedef enum {
     M_TEXT,
