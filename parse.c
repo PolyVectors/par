@@ -19,6 +19,8 @@ static unsigned char defined = 0;
 
 static size_t pos = 0;
 
+
+/* TODO: split this up into smaller individual functions, e.g. parse_object_root */
 static void
 parse_object(Tokens tokens, Config *config)
 {
@@ -30,7 +32,11 @@ parse_object(Tokens tokens, Config *config)
         case TT_LCurly:
             parse_object(tokens, config);
             break;
+        case TT_RCurly:
+            return;
+            break;
         case TT_String:
+            /* TODO: maybe this could be less strict, allow for catching more errors early & looks better */
             if (root
                 && pos + 2 < tokens.count
                 && tokens.array[pos + 1].type == TT_Colon
@@ -38,6 +44,15 @@ parse_object(Tokens tokens, Config *config)
                     || tokens.array[pos + 2].type == TT_Number
                     || tokens.array[pos + 2].type == TT_LBracket)
             ) {
+                /* TODO: disallow trailing commas, also this is incredibly ugly */
+                if (tokens.array[pos + 3].type != TT_Comma
+                    && tokens.array[pos + 3].type != TT_RCurly
+                    && tokens.array[pos + 2].type != TT_LBracket
+                ) {
+                    panic("expected \",\" after value, got '%s'.\n",
+                          tokens.array[pos + 3].value);
+                }
+                
                 char *identifier = tokens.array[pos].value;
                 char *value = tokens.array[pos + 2].value;
                 
@@ -49,7 +64,7 @@ parse_object(Tokens tokens, Config *config)
                 ) {
                     if (strlen(value) != 7
                         || tokens.array[pos + 2].type != TT_String)
-                        panic("identifier \"%s\" requires a hexadecimal string (i.e. #FFFFFF), got `%s`.\n",
+                        panic("identifier \"%s\" requires a hexadecimal string (i.e. #FFFFFF), got '%s'.\n",
                               identifier, value);
 
                     int foreground = !strcmp(identifier, "foreground");
@@ -60,7 +75,7 @@ parse_object(Tokens tokens, Config *config)
                                           : BACKGROUND_DEFINITION;
                 } else if (!strcmp(identifier, "position")) {
                     if (strcmp(value, "top") && strcmp(value, "bottom"))
-                        panic("identifier \"position\" expects either a string top or bottom, got `%s`.\n",
+                        panic("identifier \"position\" expects a string either \"top\" or \"bottom\", got '%s'.\n",
                               value);
                     config->position = !strcmp(value, "bottom")
                                         ? CONFIG_POSITION_BOTTOM
@@ -70,9 +85,9 @@ parse_object(Tokens tokens, Config *config)
                            || !strcmp(identifier, "gaps")
                 ) {
                     if (tokens.array[pos + 2].type != TT_Number)
-                        panic("identifier \"height\" expects a number, got `%s`.\n",
+                        panic("identifier \"height\" expects a number, got '%s'.\n",
                               value);
-                   
+
                     if (!strcmp(identifier, "height")) {
                         config->height = atoi(value);
                         defined |= HEIGHT_DEFINITION;
@@ -84,20 +99,32 @@ parse_object(Tokens tokens, Config *config)
                 } else if (!strcmp(identifier, "separator")) {
                     if (tokens.array[pos + 2].type != TT_String
                         || strlen(value) != 1)
-                        panic("identifier \"separator\" expects a single character, got `%s`.\n",
+                        panic("identifier \"separator\" expects a single character, got '%s'.\n",
                               value);
                     config->separator = value[0];
                     defined |= SEPARATOR_DEFINITION;
+                } else if (!strcmp(identifier, "left-modules")
+                           || !strcmp(identifier, "right-modules"))
+                {
+                    /* TODO: parse modules */
+                } else {
+                    panic("unknown identifier '%s'\n", identifier);
                 }
-                /* TODO: left-modules, right-modules */
+
+
+                /* TODO: this is not always the case (i.e. last name value pair or lists) */
+                pos += 3;
             }
             break;
         default:
+            printf("Unexpected token type '%d'\n", tokens.array[pos].type);
             break;
         }
         
         pos++;
     }
+
+    panic("expected closing brace \"}\" while parsing config, got nothing.\n");
 }
     
 Config *

@@ -64,6 +64,7 @@ pushnumber(Tokens *tokens)
             break;
         pos++;
     }
+    pos--;
 
     Token token = { .type = TT_Number };
     strncpy(token.value, source + startpos, pos - startpos);
@@ -121,7 +122,7 @@ lex_config(const char *path)
             if (source[pos] >= '0' || source[pos] <= '9')
                 pushnumber(&tokens);
             else
-                panic("Unexpected character `%c` while lexing", source[pos]);
+                panic("Unexpected character '%c' while lexing", source[pos]);
         }
         pos++;
     }
