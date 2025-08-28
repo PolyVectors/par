@@ -63,9 +63,11 @@ bar_create(Config *config)
                       config->foreground, &bar->foreground);
     
     XSetWindowAttributes setattributes = {
-        .colormap = bar->colormap,
         .background_pixel = bar->background.pixel,
-        .event_mask = ExposureMask
+        .border_pixel = bar->background.pixel,
+        .override_redirect = 0,
+        .event_mask = ExposureMask,
+        .colormap = bar->colormap
     };
 
     XWindowAttributes attributes;
@@ -81,7 +83,7 @@ bar_create(Config *config)
     bar->window = XCreateWindow(bar->display, root, bar->x, bar->y,
                                 bar->width, bar->height, 0,
                                 bar->depth, InputOutput, bar->visual,
-                                CWColormap | CWBackPixel | CWEventMask,
+                                CWBackPixel | CWBorderPixel | CWOverrideRedirect | CWEventMask | CWColormap,
                                 &setattributes);
 
     XStoreName(bar->display, bar->window, "par");
