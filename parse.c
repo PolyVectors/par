@@ -20,7 +20,7 @@ static unsigned char defined = 0;
 static size_t pos = 0;
 
 static void
-parse_array()
+parse_module(Tokens tokens, Config *config)
 {
     
 }
@@ -35,13 +35,13 @@ parse_object(Tokens tokens, Config *config)
 
     while (pos < tokens.count) {
         switch (tokens.array[pos].type) {
-        case TT_LCurly:
+        case TOKEN_TYPE_L_BRACE:
             parse_object(tokens, config);
             break;
-        case TT_RCurly:
+        case TOKEN_TYPE_R_BRACE:
             return;
             break;
-        case TT_String:
+        case TOKEN_TYPE_STRING:
             if (root) {
                 char *identifier = tokens.array[pos].value;
                 char *value = tokens.array[pos + 2].value;
@@ -53,7 +53,7 @@ parse_object(Tokens tokens, Config *config)
                          || !strcmp(identifier, "background")
                 ) {
                     if (strlen(value) != 7
-                        || tokens.array[pos + 2].type != TT_String)
+                        || tokens.array[pos + 2].type != TOKEN_TYPE_STRING)
                         panic("identifier \"%s\" requires a hexadecimal string (i.e. #FFFFFF), got '%s'.\n",
                               identifier, value);
 
@@ -74,7 +74,7 @@ parse_object(Tokens tokens, Config *config)
                 } else if (!strcmp(identifier, "height")
                            || !strcmp(identifier, "gaps")
                 ) {
-                    if (tokens.array[pos + 2].type != TT_Number)
+                    if (tokens.array[pos + 2].type != TOKEN_TYPE_NUMBER)
                         panic("identifier \"height\" expects a number, got '%s'.\n",
                               value);
 
@@ -87,7 +87,7 @@ parse_object(Tokens tokens, Config *config)
                     }
 
                 } else if (!strcmp(identifier, "separator")) {
-                    if (tokens.array[pos + 2].type != TT_String
+                    if (tokens.array[pos + 2].type != TOKEN_TYPE_STRING
                         || strlen(value) != 1)
                         panic("identifier \"separator\" expects a single character, got '%s'.\n",
                               value);
@@ -97,15 +97,15 @@ parse_object(Tokens tokens, Config *config)
                            || !strcmp(identifier, "right-modules"))
                 {
                     /* TODO: parse modules */
-                } else {
-                    panic("unknown identifier '%s'\n", identifier);
-                }
+                } else
+                    panic("unknown identifier '%s'.\n", identifier);
                 
-                pos += tokens.array[pos + 3].type != TT_RCurly ? 3 : 2;
+                pos += tokens.array[pos + 3].type != TOKEN_TYPE_R_BRACE ? 3 : 2;
             }
             break;
         default:
-            printf("unexpected token type '%d'\n", tokens.array[pos].type);
+            /* TODO: panic */
+            printf("unexpected token type '%d'.\n", tokens.array[pos].type);
             break;
         }
         
@@ -122,7 +122,7 @@ parse_config(Tokens tokens)
 
     while (pos < tokens.count) {
         switch (tokens.array[pos].type) {
-        case TT_LCurly:
+        case TOKEN_TYPE_L_BRACE:
             parse_object(tokens, config);
             break;
         default:

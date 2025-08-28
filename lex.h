@@ -4,14 +4,14 @@
 #include <stdlib.h>
 
 typedef enum {
-    TT_LCurly,
-    TT_RCurly,
-    TT_LBracket,
-    TT_RBracket,
-    TT_Number,
-    TT_String,
-    TT_Colon,
-    TT_Comma
+    TOKEN_TYPE_L_BRACE,
+    TOKEN_TYPE_R_BRACE,
+    TOKEN_TYPE_L_BRACKET,
+    TOKEN_TYPE_R_BRACKET,
+    TOKEN_TYPE_NUMBER,
+    TOKEN_TYPE_STRING,
+    TOKEN_TYPE_COLON,
+    TOKEN_TYPE_COMMA
 } TokenType;
 
 typedef struct {

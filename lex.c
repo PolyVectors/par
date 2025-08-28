@@ -51,11 +51,14 @@ pushstring(Tokens *tokens)
         pos++;
     }
 
-    Token token = { .type = TT_String };
+    Token token = { .type = TOKEN_TYPE_STRING };
     strncpy(token.value, source + startpos, pos - startpos);
     
     TokenType previous = tokens->array[tokens->count - 1].type;
-    if (previous != TT_Comma && previous != TT_Colon && previous != TT_LCurly)
+    if (previous != TOKEN_TYPE_COMMA
+        && previous != TOKEN_TYPE_COLON
+        && previous != TOKEN_TYPE_L_BRACE
+    )
         panic("expected \",\" or \":\" before string '%s', got '%s'.\n",
               token.value, tokens->array[tokens->count - 1].value);
 
@@ -72,10 +75,10 @@ pushnumber(Tokens *tokens)
         pos++;
     }
 
-    Token token = { .type = TT_Number };
+    Token token = { .type = TOKEN_TYPE_NUMBER };
     strncpy(token.value, source + startpos, pos - startpos);
     
-    if (tokens->array[tokens->count - 1].type != TT_Colon)
+    if (tokens->array[tokens->count - 1].type != TOKEN_TYPE_COLON)
         panic("expected \",\" or \":\" before number '%s', got '%s'.\n",
               token.value, tokens->array[tokens->count - 1].value);
     
@@ -112,26 +115,30 @@ lex_config(const char *path)
         case '{':
         case '}':
             tokens_push(&tokens, (Token){
-                .type = source[pos] == '{' ? TT_LCurly : TT_RCurly,
+                .type = source[pos] == '{' ? TOKEN_TYPE_L_BRACE
+                                           : TOKEN_TYPE_R_BRACE,
                 .value = source[pos]
             });
             break;
         case '[':
         case ']':
             tokens_push(&tokens, (Token){
-                .type = source[pos] == '[' ? TT_LBracket : TT_RBracket,
+                .type = source[pos] == '[' ? TOKEN_TYPE_L_BRACKET
+                                           : TOKEN_TYPE_R_BRACKET,
                 .value = source[pos]
             });
             break;
         case ':':
-            if (tokens.array[tokens.count - 1].type != TT_String)
+            if (tokens.array[tokens.count - 1].type != TOKEN_TYPE_STRING)
                 panic("expected a string before \":\", got `%s`.\n",
                       tokens.array[tokens.count - 1]);
             
-            tokens_push(&tokens, (Token){ .type = TT_Colon, .value = ":" });
+            tokens_push(&tokens,
+                        (Token){ .type = TOKEN_TYPE_COLON, .value = ":" });
             break;
         case ',':
-            tokens_push(&tokens, (Token){ .type = TT_Comma, .value = "," });
+            tokens_push(&tokens,
+                        (Token){ .type = TOKEN_TYPE_COMMA, .value = "," });
             break;
         case '"':
             pushstring(&tokens);
@@ -145,10 +152,10 @@ lex_config(const char *path)
         pos++;
     }
 
-    if (tokens.array[tokens.count - 1].type != TT_RCurly)
+    if (tokens.array[tokens.count - 1].type != TOKEN_TYPE_R_BRACE)
         panic("expected config to end in \"}\", got '%s'.\n",
               tokens.array[tokens.count - 1].value);
-    if (tokens.array[tokens.count - 2].type == TT_Comma)
+    if (tokens.array[tokens.count - 2].type == TOKEN_TYPE_COMMA)
         panic("found trailing comma in config while lexing.\n");
 
     free(source);

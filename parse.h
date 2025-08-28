@@ -3,12 +3,14 @@
 
 #include "lex.h"
 
-#define CONFIG_POSITION_TOP       (unsigned char) 0
-#define CONFIG_POSITION_BOTTOM    (unsigned char) 1
+typedef enum {
+    CONFIG_POSITION_TOP,
+    CONFIG_POSITION_BOTTOM,
+} ConfigPosition;
 
 typedef enum {
-    M_TEXT,
-    M_CLOCK,
+    MODULE_TEXT,
+    MODULE_CLOCK,
 } ModuleType;
 
 typedef struct {
@@ -24,7 +26,7 @@ typedef struct {
     char foreground[8]; /* default value */
     char background[8];
 
-    unsigned char position;
+    ConfigPosition position;
     unsigned int height;
     unsigned int gaps;
 
