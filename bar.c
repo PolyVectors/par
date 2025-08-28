@@ -36,6 +36,7 @@ setatoms(Bar *bar, Config *config)
                     PropModeReplace, (unsigned char *)strut, 12);
  }
 
+/* TODO: fix bspwm */
 Bar *
 bar_create(Config *config)
 {
@@ -44,7 +45,6 @@ bar_create(Config *config)
     if (!(bar->display = XOpenDisplay(NULL)))
         panic("failed to open display, is X11 running?\n");
 
-    /* TODO: check if this is fine */
     bar->screen = DefaultScreen(bar->display);
     bar->visual = DefaultVisual(bar->display, bar->screen);
     bar->depth = DefaultDepth(bar->display, bar->screen); 
@@ -79,7 +79,6 @@ bar_create(Config *config)
     bar->width = attributes.width;
     bar->height = config->height;
 
-    /* TODO: border pixel (might fix bspwm issues) */
     bar->window = XCreateWindow(bar->display, root, bar->x, bar->y,
                                 bar->width, bar->height, 0,
                                 bar->depth, InputOutput, bar->visual,
@@ -94,7 +93,6 @@ bar_create(Config *config)
                                   bar->depth);
     bar->gc = XCreateGC(bar->display, bar->drawable, 0, NULL);
 
-    /* TODO: fix bspwm */
     setatoms(bar, config);
 
     XMapRaised(bar->display, bar->window);
