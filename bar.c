@@ -11,28 +11,29 @@
 static void
 setatoms(Bar *bar, Config *config)
 {
-    long strut[12] = {0};
-
-    if (config->position == CONFIG_POSITION_TOP) {
-        strut[2] = bar->height;
-        strut[8] = bar->x;
-        strut[9] = bar->x + bar->width - 1;
-    } else {
-        strut[3] = bar->height;
-        strut[10] = bar->x;
-        strut[11] = bar->width;
-    }
-
-    /* TODO: sticky, above */
-
-    Atom _NET_WM_STRUT_PARTIAL = XInternAtom(bar->display, "_NET_WM_STRUT_PARITAL", 0);
-    Atom _NET_WM_WINDOW_TYPE = XInternAtom(bar->display, "_NET_WM_WINDOW_TYPE", 0);
-    Atom _NET_WM_WINDOW_TYPE_DOCK = XInternAtom(bar->display, "_NET_WM_WINDOW_TYPE_DOCK", 0);
+    Atom _NET_WM_WINDOW_TYPE = XInternAtom(bar->display,
+                                           "_NET_WM_WINDOW_TYPE", 0);
+    Atom _NET_WM_WINDOW_TYPE_DOCK = XInternAtom(bar->display,
+                                                "_NET_WM_WINDOW_TYPE_DOCK", 0);
 
     XChangeProperty(bar->display, bar->window, _NET_WM_WINDOW_TYPE, XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)&_NET_WM_WINDOW_TYPE_DOCK, 1);
+    
+    Atom _NET_WM_STRUT_PARTIAL = XInternAtom(bar->display, "_NET_WM_STRUT_PARITAL", 0);
+    long strut[12] = {0};
+
+    if (config->position == CONFIG_POSITION_TOP) {
+        strut[2] = bar->y + bar->height;
+        strut[8] = bar->x;
+        strut[9] = bar->x + bar->width - 1;
+    } else {
+        strut[3] = bar->y + bar->height;
+        strut[10] = bar->x;
+        strut[11] = bar->width - 1;
+    }
+
     XChangeProperty(bar->display, bar->window, _NET_WM_STRUT_PARTIAL, XA_CARDINAL, 32,
-                    PropModeReplace, (unsigned char *)&strut, 12);
+                    PropModeReplace, (unsigned char *)strut, 12);
  }
 
 Bar *
@@ -48,7 +49,7 @@ bar_create(Config *config)
     bar->visual = DefaultVisual(bar->display, bar->screen);
     bar->depth = DefaultDepth(bar->display, bar->screen); 
     
-    Window root = XRootWindow(bar->display, bar->screen);
+    Window root = XDefaultRootWindow(bar->display);
 
     bar->colormap = XCreateColormap(bar->display, root,
                                     bar->visual,
@@ -76,9 +77,10 @@ bar_create(Config *config)
     bar->width = attributes.width;
     bar->height = config->height;
 
+    /* TODO: border pixel (might fix bspwm issues) */
     bar->window = XCreateWindow(bar->display, root, bar->x, bar->y,
                                 bar->width, bar->height, 0,
-                                CopyFromParent, CopyFromParent, CopyFromParent,
+                                bar->depth, InputOutput, bar->visual,
                                 CWColormap | CWBackPixel | CWEventMask,
                                 &setattributes);
 
@@ -90,16 +92,8 @@ bar_create(Config *config)
                                   bar->depth);
     bar->gc = XCreateGC(bar->display, bar->drawable, 0, NULL);
 
-    setatoms(bar, config);
-
     /* TODO: fix bspwm */
-    XWindowChanges windowchanges = {
-        .x = bar->x,
-        .y = bar->y,
-        .stack_mode = Above
-    };
-    XConfigureWindow(bar->display, bar->window, CWX | CWY | CWStackMode,
-                     &windowchanges);
+    setatoms(bar, config);
 
     XMapRaised(bar->display, bar->window);
 
@@ -130,3 +124,4 @@ bar_draw(Bar *bar, Config *config)
 
     XftDrawDestroy(draw);
 }
+
