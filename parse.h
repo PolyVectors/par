@@ -4,11 +4,6 @@
 #include "lex.h"
 
 typedef enum {
-    CONFIG_POSITION_TOP,
-    CONFIG_POSITION_BOTTOM,
-} ConfigPosition;
-
-typedef enum {
     MODULE_TEXT,
     MODULE_CLOCK,
 } ModuleType;
@@ -20,6 +15,11 @@ typedef struct {
     char *prefix, *suffix; /* nullable */
     unsigned long foreground, background; /* also nullable */
 } Module;
+
+typedef enum {
+    CONFIG_POSITION_TOP,
+    CONFIG_POSITION_BOTTOM,
+} ConfigPosition;
 
 typedef struct {
     char font[81];

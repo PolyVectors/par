@@ -15,20 +15,89 @@
 #define SEPARATOR_DEFINITION     (1 << 6)
 
 #define DEFINITIONS              7
-static unsigned char defined = 0;
 
+typedef enum {
+    MODULE_POSITION_LEFT,
+    MODULE_POSITION_RIGHT
+} ModulePosition;
+
+static unsigned char defined = 0;
 static size_t pos = 0;
 
 static void
-parse_module(Tokens tokens, Config *config)
+parsemodule(Tokens tokens, Config *config, ModulePosition position)
 {
     
+}
+
+static void
+parserootproperty(Tokens tokens, Config *config)
+{
+	char *identifier = tokens.array[pos].value;
+	char *value = tokens.array[pos + 2].value;
+
+	if (!strcmp(identifier, "font")) {
+	    strcpy(config->font, value);
+	    defined |= FONT_DEFINITION;
+	} else if (!strcmp(identifier, "foreground")
+	         || !strcmp(identifier, "background")
+	) {
+	    if (strlen(value) != 7
+	        || tokens.array[pos + 2].type != TOKEN_TYPE_STRING)
+	        panic("identifier \"%s\" requires a hexadecimal string (i.e. #FFFFFF), got '%s'.\n",
+	              identifier, value);
+
+	    int foreground = !strcmp(identifier, "foreground");
+
+	    strcpy(foreground ? config->foreground
+	                      : config->background, value);
+	    defined |= foreground ? FOREGROUND_DEFINITION
+	                          : BACKGROUND_DEFINITION;
+	} else if (!strcmp(identifier, "position")) {
+	    if (strcmp(value, "top") && strcmp(value, "bottom"))
+	        panic("identifier \"position\" expects a string either \"top\" or \"bottom\", got '%s'.\n",
+	              value);
+	    config->position = !strcmp(value, "bottom")
+	                        ? CONFIG_POSITION_BOTTOM
+	                        : CONFIG_POSITION_TOP;
+	    defined |= POSITION_DEFINITION;
+	} else if (!strcmp(identifier, "height")
+	           || !strcmp(identifier, "gaps")
+	) {
+	    if (tokens.array[pos + 2].type != TOKEN_TYPE_NUMBER)
+	        panic("identifier \"height\" expects a number, got '%s'.\n",
+	              value);
+
+	    if (!strcmp(identifier, "height")) {
+	        config->height = atoi(value);
+	        defined |= HEIGHT_DEFINITION;
+	    } else {
+	        config->gaps = atoi(value);
+	        defined |= GAPS_DEFINITION;
+	    }
+
+	} else if (!strcmp(identifier, "separator")) {
+	    if (tokens.array[pos + 2].type != TOKEN_TYPE_STRING
+	        || strlen(value) != 1)
+	        panic("identifier \"separator\" expects a single character, got '%s'.\n",
+	              value);
+	    config->separator = value[0];
+	    defined |= SEPARATOR_DEFINITION;
+	} else if (!strcmp(identifier, "left-modules")
+	           || !strcmp(identifier, "right-modules"))
+	{
+	    /* TODO: parse modules */
+	} else
+	    panic("unknown identifier '%s'.\n", identifier);
+
+    if (tokens.array[pos + 2].type != TOKEN_TYPE_L_BRACKET)
+        pos += tokens.array[pos + 3].type != TOKEN_TYPE_R_BRACE ? 3 : 2;
 }
 
 
 /* TODO: split this up into smaller individual functions, e.g. parse_object_root */
 static void
-parse_object(Tokens tokens, Config *config)
+parseobject(Tokens tokens, Config *config)
 {
     unsigned char root = pos == 0;
     pos++;
@@ -36,72 +105,14 @@ parse_object(Tokens tokens, Config *config)
     while (pos < tokens.count) {
         switch (tokens.array[pos].type) {
         case TOKEN_TYPE_L_BRACE:
-            parse_object(tokens, config);
+            parseobject(tokens, config);
             break;
         case TOKEN_TYPE_R_BRACE:
             return;
             break;
         case TOKEN_TYPE_STRING:
-            if (root) {
-                char *identifier = tokens.array[pos].value;
-                char *value = tokens.array[pos + 2].value;
-                
-                if (!strcmp(identifier, "font")) {
-                    strcpy(config->font, value);
-                    defined |= FONT_DEFINITION;
-                } else if (!strcmp(identifier, "foreground")
-                         || !strcmp(identifier, "background")
-                ) {
-                    if (strlen(value) != 7
-                        || tokens.array[pos + 2].type != TOKEN_TYPE_STRING)
-                        panic("identifier \"%s\" requires a hexadecimal string (i.e. #FFFFFF), got '%s'.\n",
-                              identifier, value);
-
-                    int foreground = !strcmp(identifier, "foreground");
-
-                    strcpy(foreground ? config->foreground
-                                      : config->background, value);
-                    defined |= foreground ? FOREGROUND_DEFINITION
-                                          : BACKGROUND_DEFINITION;
-                } else if (!strcmp(identifier, "position")) {
-                    if (strcmp(value, "top") && strcmp(value, "bottom"))
-                        panic("identifier \"position\" expects a string either \"top\" or \"bottom\", got '%s'.\n",
-                              value);
-                    config->position = !strcmp(value, "bottom")
-                                        ? CONFIG_POSITION_BOTTOM
-                                        : CONFIG_POSITION_TOP;
-                    defined |= POSITION_DEFINITION;
-                } else if (!strcmp(identifier, "height")
-                           || !strcmp(identifier, "gaps")
-                ) {
-                    if (tokens.array[pos + 2].type != TOKEN_TYPE_NUMBER)
-                        panic("identifier \"height\" expects a number, got '%s'.\n",
-                              value);
-
-                    if (!strcmp(identifier, "height")) {
-                        config->height = atoi(value);
-                        defined |= HEIGHT_DEFINITION;
-                    } else {
-                        config->gaps = atoi(value);
-                        defined |= GAPS_DEFINITION;
-                    }
-
-                } else if (!strcmp(identifier, "separator")) {
-                    if (tokens.array[pos + 2].type != TOKEN_TYPE_STRING
-                        || strlen(value) != 1)
-                        panic("identifier \"separator\" expects a single character, got '%s'.\n",
-                              value);
-                    config->separator = value[0];
-                    defined |= SEPARATOR_DEFINITION;
-                } else if (!strcmp(identifier, "left-modules")
-                           || !strcmp(identifier, "right-modules"))
-                {
-                    /* TODO: parse modules */
-                } else
-                    panic("unknown identifier '%s'.\n", identifier);
-                
-                pos += tokens.array[pos + 3].type != TOKEN_TYPE_R_BRACE ? 3 : 2;
-            }
+            if (root)
+                parserootproperty(tokens, config);
             break;
         default:
             /* TODO: panic */
@@ -123,7 +134,7 @@ parse_config(Tokens tokens)
     while (pos < tokens.count) {
         switch (tokens.array[pos].type) {
         case TOKEN_TYPE_L_BRACE:
-            parse_object(tokens, config);
+            parseobject(tokens, config);
             break;
         default:
             break;

@@ -1,5 +1,7 @@
+#include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
+#include <X11/Xlib.h>
 
 #include "bar.h"
 #include "parse.h"
@@ -70,7 +72,7 @@ bar_create(Config *config)
         panic("failed to get window attributes for root window");
     
     bar->x = 0;
-    bar->y = config->position == CONFIG_POSITION_TOP ? 0 :attributes.height - config->height;
+    bar->y = config->position == CONFIG_POSITION_TOP ? 0 : attributes.height - config->height;
     bar->width = attributes.width;
     bar->height = config->height;
 
@@ -89,6 +91,15 @@ bar_create(Config *config)
     bar->gc = XCreateGC(bar->display, bar->drawable, 0, NULL);
 
     setatoms(bar, config);
+
+    /* TODO: fix bspwm */
+    XWindowChanges windowchanges = {
+        .x = bar->x,
+        .y = bar->y,
+        .stack_mode = Above
+    };
+    XConfigureWindow(bar->display, bar->window, CWX | CWY | CWStackMode,
+                     &windowchanges);
 
     XMapRaised(bar->display, bar->window);
 
