@@ -19,6 +19,12 @@ static unsigned char defined = 0;
 
 static size_t pos = 0;
 
+static void
+parse_array()
+{
+    
+}
+
 
 /* TODO: split this up into smaller individual functions, e.g. parse_object_root */
 static void
@@ -36,23 +42,7 @@ parse_object(Tokens tokens, Config *config)
             return;
             break;
         case TT_String:
-            /* TODO: maybe this could be less strict, allow for catching more errors early & looks better */
-            if (root
-                && pos + 2 < tokens.count
-                && tokens.array[pos + 1].type == TT_Colon
-                && (tokens.array[pos + 2].type == TT_String
-                    || tokens.array[pos + 2].type == TT_Number
-                    || tokens.array[pos + 2].type == TT_LBracket)
-            ) {
-                /* TODO: disallow trailing commas, also this is incredibly ugly */
-                if (tokens.array[pos + 3].type != TT_Comma
-                    && tokens.array[pos + 3].type != TT_RCurly
-                    && tokens.array[pos + 2].type != TT_LBracket
-                ) {
-                    panic("expected \",\" after value, got '%s'.\n",
-                          tokens.array[pos + 3].value);
-                }
-                
+            if (root) {
                 char *identifier = tokens.array[pos].value;
                 char *value = tokens.array[pos + 2].value;
                 
@@ -110,14 +100,12 @@ parse_object(Tokens tokens, Config *config)
                 } else {
                     panic("unknown identifier '%s'\n", identifier);
                 }
-
-
-                /* TODO: this is not always the case (i.e. last name value pair or lists) */
-                pos += 3;
+                
+                pos += tokens.array[pos + 3].type != TT_RCurly ? 3 : 2;
             }
             break;
         default:
-            printf("Unexpected token type '%d'\n", tokens.array[pos].type);
+            printf("unexpected token type '%d'\n", tokens.array[pos].type);
             break;
         }
         
