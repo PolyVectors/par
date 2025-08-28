@@ -95,7 +95,6 @@ parserootproperty(Tokens tokens, Config *config)
 }
 
 
-/* TODO: split this up into smaller individual functions, e.g. parse_object_root */
 static void
 parseobject(Tokens tokens, Config *config)
 {
