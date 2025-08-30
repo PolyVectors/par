@@ -1,12 +1,15 @@
 par, an elementary X11 status bar
 =================================
 
+information
+-----------
+this is a more extreme version of the original par idea:
+less dependencies, less memory usage, same features.
+
 requirements
 ------------
-a C compiler w/ a libc implementation, default is zig (https://ziglang.org/)
-
-libX11.so w/ headers
-libXft.so w/ headers & freetype2 headers
+a zig compiler (version 0.15.1 recommended) w/ std files
+libxcb.so (no c headers required)
 
 inspirations
 ------------

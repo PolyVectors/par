@@ -1,3 +1,4 @@
-par
+./zig-out
+./zig-out/*
 .vscode
 .vscode/*
